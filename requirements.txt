@@ -1,0 +1,4 @@
+BackTranslation==0.2.1
+numpy==1.17.0
+pandas==0.25.0
+tqdm==4.49.0
