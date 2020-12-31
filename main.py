@@ -3,6 +3,7 @@ from Utils import dataHelper as dh
 import os
 import pandas as pd
 import numpy as np
+from Utils.augmentation import DataAugment
 
 
 
@@ -10,9 +11,17 @@ import numpy as np
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     #dh.readRawData(os.getcwd(), 'data/final_annotation.csv')
-    dh.groundTruth('data/formatted_dataset.csv', os.getcwd())
+    # dh.groundTruth('data/formatted_dataset.csv', os.getcwd())
     #print(dh.head(5))
     data = pd.read_csv('data/ground_truth.csv')
     data = dh.dataClean(data)
-    data = dh.validateData(data)
+    dh.validateData(data)
+    data = dh.resetID(data)
+    data.to_csv('data/clean_data.csv', index=False, encoding='utf-8')
 
+
+    data = pd.read_csv('data/clean_data.csv', encoding='utf-8')
+    da = DataAugment()
+    result = da.translate(data)
+    print('Starting Back-Translation.....')
+    result.to_csv('data/backtranslated_dataset.csv', index=False)
