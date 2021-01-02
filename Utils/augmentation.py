@@ -20,6 +20,8 @@ class Augmenter():
     def __init__(self, url = 'https://translate.google.com/'):
         self.url = url
         self.trans = BackTranslation()
+        self.permissions = ['None', 'Calendar', 'Camera', 'Contacts', 'Location', 'Mircophone', 'Phone',
+                            'SMS', 'Call_Log', 'Storage', 'Sensors']
 
 
     def translate(self, data, src='en', tmp='zh-cn'):
@@ -86,43 +88,103 @@ class Augmenter():
 
 
     def merge(self, data):
+        """
+
+        :param data: required. Our labeled data.
+        :return:
+        """
         #TODO:merge our dataset with more positive samples from other dataset
         # load other dataset
         def handleACNet(id, result, data):
             # remove irrelevant columns
-            columns = ['SETTOMGS', 'TAKS', 'Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15',
+            columns = ['SETTINGS', 'TASKS', 'Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15',
                        'Unnamed: 16', 'Unnamed: 17']
             data.drop(columns=columns, inplace=True)
-            id = result['id'][-1] if len(result) != 0 else id
+            data.dropna(how='any', inplace=True)
+
             header = data.columns.tolist()[2:]
+            pbar = tqdm(len(data))
             for index, row in data.iterrows():
-                if 1 in row[2:]:
+                if 1 in row[2:].tolist():
                     id += 1
                     result['id'].append(id)
                     result['text'].append(row['sentence'])
-                    # TODO: 需要根据我们自己数据集的header进行重新赋值！！！！
-                    for permission in header:
-                        if row[permission] == 1:
-                            result[permission].append(1)
+
+                    for permission in self.permissions:
+                        if permission.upper() in header:
+                            if row[permission.upper()]==1:
+                                result[permission].append(1)
+                            else:
+                                result[permission].append(0)
                         else:
                             result[permission].append(0)
+                pbar.update(1)
+            pbar.close()
+            return id, result
 
 
 
-        def handleWHYPER():
-            pass
+        def handleWHYPER(id, result, permission, data):
+            """
+
+            :param id:
+            :param result:
+            :param data:
+            :return:
+            """
+            # deleting the useless colomns
+            rmColomns = [col for col in data.columns.tolist() if col.startswith('Unnamed')]
+            data.drop(columns=rmColomns, inplace=True)
+            data.dropna(how='any', inplace=True)
+
+            header = data.columns.tolist()
+            pbar = tqdm(len(data))
+            for index, row in data.iterrows():
+                pbar.update(1)
+                if row[header[1]] in [1,2,3]: # 1,2,3 indicate positive samples in WHYPER dataset
+                    id += 1
+                    result['id'].append(id)
+                    result['text'].append(row[header[0]])
+
+                    for per in self.permissions:
+                        if permission.lower() == per.lower() and row[header[1]] == 1:
+                            result[per].append(1)
+                        else:
+                            result[per].append(0)
+            pbar.close()
+
+            return id, result
 
 
         whyper_Calendar = pd.read_excel('data/dataset/Read_Calendar.xls')
         whyper_Contacts = pd.read_excel('data/dataset/Read_Contacts.xls')
         whyper_Audio = pd.read_excel('data/dataset/Record_Audio.xls')
         acnet = pd.read_excel('data/dataset/ACNet.xlsx')
+        whyper_data = {'Calendar': whyper_Calendar, 'Contacts': whyper_Contacts, 'Mircophone': whyper_Audio}
 
 
         # create the dict for saving formatted data
         id = np.max(data['id'].values)
-        results = {key: [] for key in data.columns.values}
-        results = handleACNet(id, results, acnet)
+        results = {key:[] for key in data.columns.tolist()}
+
+        print("Extracting positive smaples from AC-Net ......")
+        id, results = handleACNet(id, results, acnet)
+
+
+        print("Extracting positive samples from WHYPER ......")
+        for permission, whyper in whyper_data.items():
+            id, results = handleWHYPER(id, results, permission, whyper)
+
+
+        # combine the original dataset with new extra data from previous works
+        posData = pd.DataFrame(results)
+
+        frames = [data, posData]
+        result = pd.concat(frames)
+
+        #result.to_csv('data/combined_clean_data.csv', index=False)
+        return result
+
 
 
 
