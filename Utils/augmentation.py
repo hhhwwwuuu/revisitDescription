@@ -8,13 +8,18 @@ This library is used for data augmentation.
 
 from BackTranslation import BackTranslation
 import numpy as np
-import pandas as pd
+# import pandas as pd
 from tqdm import tqdm
 import stanza
 from nltk.corpus import wordnet as wn
-from nltk.parse.stanford import StanfordParser
-import nltk
+# import nltk
 import pandas as pd
+from stanza.server import CoreNLPClient
+
+
+import os
+
+os.environ['STANFORD_PARSER'] = "H:\Google Drive\Implementation\revisitDescription\data\parser\stanford-parser-full-2020-11-17"
 
 class Augmenter():
     def __init__(self, url = 'https://translate.google.com/'):
@@ -22,6 +27,13 @@ class Augmenter():
         self.trans = BackTranslation()
         self.permissions = ['None', 'Calendar', 'Camera', 'Contacts', 'Location', 'Mircophone', 'Phone',
                             'SMS', 'Call_Log', 'Storage', 'Sensors']
+        self.nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma,depparse',
+                                   tokenize_no_ssplit = True)
+
+        self.client = CoreNLPClient(timeout=30000, memory='8G')
+        #stanza.install_corenlp()
+        #stanza.download_corenlp_models(model='english', version='4.2.0')
+
 
 
     def translate(self, data, src='en', tmp='zh-cn'):
@@ -64,23 +76,61 @@ class Augmenter():
         return result
 
 
-    def _POStagging(self, sentence):
-        #TODO: analyze the POS of sentence, pick the verb and noun
-        # For Thesaurus
-        pass
+    def _tag(self, tag):
+        if tag.startswith('NN'):
+            return wn.NOUN
+        if tag.startswith('VB'):
+            return wn.VERB
 
 
-    def thesaurus(self, data):
-        # nlp = stanza.Pipeline(lang='en', processors='tokenize,mwt,pos,lemma,depparse')
-        # doc = nlp(data)
-        # print(
-        #     *[f'word: {word.text}\tupos: {word.upos}\txpos: {word.xpos}\tfeats: {word.feats if word.feats else "_"}' for
-        #       sent in doc.sentences for word in sent.words], sep='\n')
-        # print(*[
-        #     f'id: {word.id}\tword: {word.text}\thead id: {word.head}\thead: {sent.words[word.head - 1].text if word.head > 0 else "root"}\tdeprel: {word.deprel}\txpos:{word.xpos}'
-        #     for sent in doc.sentences for word in sent.words], sep='\n')
-        print(nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(data))))
-        #print(nltk.parse(data))
+    def noun_phrases(self,_client, _text, _annotators=None):
+        pattern = 'NP'
+        matches = _client.tregex(_text,pattern,annotators=_annotators)
+        print("\n".join(
+            ["\t" + sentence[match_id]['spanString'] for sentence in matches['sentences'] for match_id in sentence]))
+        for sentence in matches['sentences']:
+            print(sentence)
+
+
+
+
+    def thesaurus(self, text):
+        """
+
+        :param data:
+        :return:
+        """
+        # generate the syntax tree
+        doc = self.nlp(text)
+
+        print(*[
+            f'id: {word.id}\tword: {word.text}\thead id: {word.head}\thead: {sent.words[word.head - 1].text if word.head > 0 else "root"}\tdeprel: {word.deprel}\txpos:{word.xpos}'
+            for sent in doc.sentences for word in sent.words], sep='\n')
+
+        # change the verb and noun with synonyms
+        for sent in doc.sentences:
+            self.noun_phrases(self.client, sent.text, _annotators="tokenize,ssplit,pos,lemma,parse")
+            for word in sent.words:
+                if word.xpos.startswith('VB') or word.xpos.startswith('NN'):
+                    print(word.text, self.synonyms(word.text, self._tag(word.xpos)))
+
+
+        # match the noun phrases
+        # with CoreNLPClient(timeout=30000, memory='16G') as client:
+        #     englishText = data
+        #     print('---')
+        #     print(englishText)
+        #     self.noun_phrases(client, englishText, _annotators="tokenize,ssplit,pos,lemma,parse")
+
+
+    def synonyms(self, word, tag):
+        syn = []
+        for synset in wn.synsets(word, pos=tag):
+            for l in synset.lemmas():
+                syn.append(l.name())
+        syn = list(set(syn))
+        return syn
+
 
 
 
@@ -96,6 +146,13 @@ class Augmenter():
         #TODO:merge our dataset with more positive samples from other dataset
         # load other dataset
         def handleACNet(id, result, data):
+            """
+
+            :param id:
+            :param result:
+            :param data:
+            :return:
+            """
             # remove irrelevant columns
             columns = ['SETTINGS', 'TASKS', 'Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15',
                        'Unnamed: 16', 'Unnamed: 17']
