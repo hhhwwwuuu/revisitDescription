@@ -8,8 +8,8 @@ perList = ['Calendar', 'Contacts', 'Camera', 'Location', 'Microphone', 'Phone', 
 
 def dataReader():
     print(os.getcwd())
-    data = pd.read_csv('../data/permission_preprocessed.csv', encoding= 'utf-8')
-       
+    data = pd.read_csv('../../data/permission_preprocessed.csv', encoding= 'utf-8')
+
 
     def getPermissions(data):
         perList = data.columns.values.tolist()[2:]
