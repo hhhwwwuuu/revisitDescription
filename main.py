@@ -3,9 +3,12 @@ from Utils import dataHelper as dh
 import os
 import pandas as pd
 import numpy as np
-from Utils.augmentation import Augmenter
+#from Utils.augmentation import Augmenter
 import stanza
-
+import random
+from nltk.corpus import wordnet as wn
+import tensorflow as tf
+from Utils import Augmenter
 
 
 # Press the green button in the gutter to run the script.
@@ -28,5 +31,44 @@ if __name__ == '__main__':
 
     #stanza.download(lang='en', processors='tokenize,mwt,pos,lemma,depparse')
 
+
+    """
+    数据增强
+    1. 合并其他数据集
+    2. back-translation
+    3. thesaurus
+    """
+
+    #da.thesaurus("You can use it as a note or memo recorder, voice recorder, voice recorder, or even record the entire conversation")
+
+    # data = pd.read_csv('data/clean_data.csv')
+    # data = da.merge(data)
+    #
+    # print('Starting Back-Translation.....')
+    # result = result = da.translate(data)
+    # result.to_csv('data/backtranslated_dataset.csv', index=False)
+
+    data = pd.read_csv('data/backtranslated_dataset_0108.csv')
+
+
     da = Augmenter()
-    da.thesaurus("Record your voice, press play and listen.")
+    #print(da.synonyms('save', wn.VERB))
+    #thesaurus = da.thesaurus(data)
+    #thesaurus.to_csv('data/thesaurus.csv', index=False, encoding='utf-8')
+    #tmp = da.sentenceRefactor('Enjoy painting a Rainbow of Glitter Coloring Pages filled with Mystical Unicorns, Ponies, Magical Horses, and Rainbow Ice Cream!')
+    thesaurus = da.thesaurus_verb(data)
+    thesaurus.to_csv('data/thesaurus_0111.csv', index=False)
+
+    #da = Augmenter()
+    # doc = da.nlp("Read calendar events - access is required for the calendar event counter.")
+    # ids = [1, 7]
+    # word_list = [word for sent in doc.sentences for word in sent.words]
+    # noun_map = {}
+    # for verb in ids:
+    #     noun_map[word_list[verb - 1].lemma] = list(set(da.search_noun([verb], word_list)))
+    #
+    # print(noun_map)
+
+
+
+

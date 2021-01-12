@@ -1,5 +1,5 @@
-BackTranslation==0.2.2
+BackTranslation
 pandas
 tqdm
 numpy
-
+networkx
