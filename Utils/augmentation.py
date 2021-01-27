@@ -8,7 +8,6 @@ This library is used for data augmentation.
 
 from BackTranslation import BackTranslation
 import numpy as np
-# import pandas as pd
 from tqdm import tqdm
 import stanza
 from nltk.corpus import wordnet as wn
@@ -24,7 +23,7 @@ import json
 
 import os
 
-os.environ['STANFORD_PARSER'] = "H:\Google Drive\Implementation\revisitDescription\data\parser\stanford-parser-full-2020-11-17"
+#os.environ['STANFORD_PARSER'] = "H:\Google Drive\Implementation\revisitDescription\data\parser\stanford-parser-full-2020-11-17"
 
 class Augmenter():
     def __init__(self, url = 'https://translate.google.com/'):
@@ -397,7 +396,7 @@ class Augmenter():
             id, tmp_frame = self.replace_verb(id, noun_map, data.groupby(permission).get_group(1))
             thesaurus_result.append(tmp_frame)
         pbar.close()
-        common_verb = json.dumps(commons)
+        common_verb = json.dumps(commons, indent=4, separators=(',',':'))
         with open('data/common_verbs.json', 'w') as f:
             f.write(common_verb)
             f.close()

@@ -1,0 +1,125 @@
+{
+    "Entertainment":[
+        "Storage"
+    ],
+    "Tools":[
+        "Storage"
+    ],
+    "Beauty":[
+        "Storage"
+    ],
+    "Weather":[
+        "Storage",
+        "Location"
+    ],
+    "Books & Reference":[
+        "Storage"
+    ],
+    "Music & Audio":[
+        "Storage"
+    ],
+    "Maps & Navigation":[
+        "Location",
+        "Storage"
+    ],
+    "Art & Design":[
+        "Storage"
+    ],
+    "Libraries & Demo":[
+        "Storage"
+    ],
+    "Travel & Local":[
+        "Location",
+        "Storage",
+        "Camera"
+    ],
+    "Finance":[
+        "Storage",
+        "Camera"
+    ],
+    "Photography":[
+        "Camera",
+        "Storage"
+    ],
+    "News & Magazines":[
+        "Storage",
+        "Location"
+    ],
+    "Parenting":[
+        "Storage",
+        "Location"
+    ],
+    "Education":[
+        "Storage"
+    ],
+    "Shopping":[
+        "Storage",
+        "Location",
+        "Camera"
+    ],
+    "Social":[
+        "Storage",
+        "Camera",
+        "Location"
+    ],
+    "GAME":[
+        "Storage"
+    ],
+    "Dating":[
+        "Storage",
+        "Location",
+        "Camera"
+    ],
+    "Health & Fitness":[
+        "Storage",
+        "Location"
+    ],
+    "Auto & Vehicles":[
+        "Storage",
+        "Location"
+    ],
+    "Comics":[
+        "Storage"
+    ],
+    "Personalization":[
+        "Storage"
+    ],
+    "Communication":[
+        "Storage",
+        "Phone",
+        "Contacts"
+    ],
+    "Productivity":[
+        "Storage",
+        "Location"
+    ],
+    "Food & Drink":[
+        "Storage",
+        "Location"
+    ],
+    "Lifestyle":[
+        "Storage",
+        "Location"
+    ],
+    "Events":[
+        "Storage",
+        "Camera"
+    ],
+    "Video Players & Editors":[
+        "Storage",
+        "Microphone"
+    ],
+    "Medical":[
+        "Storage",
+        "Camera"
+    ],
+    "House & Home":[
+        "Storage",
+        "Location"
+    ],
+    "Business":[
+        "Storage",
+        "Location",
+        "Camera"
+    ]
+}

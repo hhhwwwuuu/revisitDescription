@@ -7,7 +7,7 @@ import os
 perList = ['Calendar', 'Contacts', 'Camera', 'Location', 'Microphone', 'Phone', 'SMS', 'Call Log', 'Storage', 'Sensors']
 
 def dataReader():
-    print(os.getcwd())
+    #print(os.getcwd())
     data = pd.read_csv('../../data/permission_preprocessed.csv', encoding= 'utf-8')
 
 
@@ -47,7 +47,7 @@ def buildGraph(category, permissions, data):
         return graph
 
     # create an empyt graph, namly category of apps
-    graph = nx.Graph(name=category)
+    graph = nx.Graph(name=category, num = len(data))
 
     # init all nodes by permissions
     graph.add_nodes_from(permissions)
@@ -63,6 +63,12 @@ def buildGraph(category, permissions, data):
             graph.nodes[per]['count'] = data[per].value_counts()[1]
         except:
             graph.nodes[per]['count'] = 0
+
+        #print(data.apply(lambda x:x[2:].sum(), axis = 1))
+        try:
+            graph.nodes[per]['individual'] = len(data.loc[(data[per]==1) & (data.apply(lambda x:x[2:].sum(), axis = 1) ==1)])
+        except:
+            graph.nodes[per]['individual'] = 0
 
     graph = connectEdge(graph)
 
@@ -86,6 +92,8 @@ def weightMatrix(graph, mtype = 'weight'):
 
     for node, neighbors in adjList:
         row = perList.index(node)
+        #print(graph.nodes[node])
+        adj_matrix[row, row] = graph.nodes[node]['individual'] if mtype == 'weight' else 1
         for key, val in neighbors.items():
             adj_matrix[row, perList.index(key)] = val['weight'] if mtype == 'weight' else 1
     #print(adj_matrix)

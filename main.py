@@ -3,7 +3,6 @@ from Utils import dataHelper as dh
 import os
 import pandas as pd
 import numpy as np
-#from Utils.augmentation import Augmenter
 import stanza
 import random
 from nltk.corpus import wordnet as wn
@@ -48,16 +47,18 @@ if __name__ == '__main__':
     # result = result = da.translate(data)
     # result.to_csv('data/backtranslated_dataset.csv', index=False)
 
-    data = pd.read_csv('data/backtranslated_dataset_0108.csv')
+    data = pd.read_csv('data/clean_data.csv')
 
 
     da = Augmenter()
-    #print(da.synonyms('save', wn.VERB))
-    #thesaurus = da.thesaurus(data)
-    #thesaurus.to_csv('data/thesaurus.csv', index=False, encoding='utf-8')
-    #tmp = da.sentenceRefactor('Enjoy painting a Rainbow of Glitter Coloring Pages filled with Mystical Unicorns, Ponies, Magical Horses, and Rainbow Ice Cream!')
+    print('Starting Replace synonyms.....')
     thesaurus = da.thesaurus_verb(data)
-    thesaurus.to_csv('data/thesaurus_0111.csv', index=False)
+
+    print('Starting Back-Translation.....')
+    result = da.translate(thesaurus)
+    #print('Starting Replace synonyms.....')
+    #thesaurus = da.thesaurus_verb(result)
+    result.to_csv('data/thesaurus_back_0112.csv', index=False)
 
     #da = Augmenter()
     # doc = da.nlp("Read calendar events - access is required for the calendar event counter.")

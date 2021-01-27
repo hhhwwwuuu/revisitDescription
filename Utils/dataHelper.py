@@ -96,7 +96,7 @@ def dataClean(data):
     # None --> remove partial of records V
 
     # def rmvPunct(sentence):
-    #     rule = re.compile(r"\\【.*?】+|\\《.*?》+|\\#.*?#+|[.!/_,$&%^*()<>+""'?@|:~{}#]+|[——！\\\，。=？、：“”‘’￥……（）《》【】]")
+    #     rule = re.compile(r"\\【.*?】+|\\《.*?》+|\\#.*?#+|[.!/_,$&%^*()<>+""'?@|:~{}#]+||[——！\\\，。=？、：“”‘’￥……（）《》【】]")
     #     return rule.sub('', sentence)
     #
     # def rmBlank(sentence):
